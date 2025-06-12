@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Compact Modern Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  .calculator {
+    background: rgba(24, 40, 72, 0.85);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 24px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .calculator h1 {
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin: 0 0 12px 0;
+    text-align: center;
+    background: linear-gradient(135deg, #76c7f1, #00ffa2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    user-select: none;
+  }
+
+  .display {
+    background-color: rgba(255 255 255 / 0.1);
+    border-radius: 12px;
+    min-height: 60px;
+    padding: 12px 20px;
+    font-size: 1.9rem;
+    font-weight: 600;
+    text-align: right;
+    color: #e0f7fa;
+    font-feature-settings: "tnum";
+    letter-spacing: 0.05em;
+    user-select: none;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+
+  button {
+    background: rgba(255 255 255 / 0.06);
+    border: none;
+    border-radius: 12px;
+    padding: 18px 0;
+    font-size: 1.1rem;
+    color: #cfe8f5;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition:
+      background-color 0.25s ease,
+      transform 0.15s ease,
+      box-shadow 0.3s ease;
+    user-select: none;
+  }
+
+  button:focus-visible {
+    outline: 3px solid #00ffa2;
+    outline-offset: 2px;
+  }
+
+  button:hover {
+    background: rgba(0, 255, 162, 0.15);
+    box-shadow: 0 8px 30px rgba(0, 255, 162, 0.4);
+    transform: scale(1.05);
+  }
+
+  button.operator {
+    background: linear-gradient(135deg, #38b6ff, #00ffa2);
+    color: #0f2027;
+    font-weight: 700;
+  }
+
+  button.operator:hover {
+    background: linear-gradient(135deg, #00ffa2, #38b6ff);
+    box-shadow: 0 8px 30px rgba(0, 255, 162, 0.7);
+  }
+
+  button.equals {
+    background: linear-gradient(135deg, #ff5f6d, #ffc371);
+    color: #0f2027;
+    font-weight: 700;
+    grid-column: span 3;
+  }
+
+  button.equals:hover {
+    background: linear-gradient(135deg, #ffc371, #ff5f6d);
+    box-shadow: 0 8px 30px rgba(255, 121, 113, 0.7);
+  }
+
+  button.clear {
+    background: linear-gradient(135deg, #ff6174, #b22443);
+    color: white;
+    font-weight: 700;
+  }
+
+  button.clear:hover {
+    background: linear-gradient(135deg, #b22443, #ff6174);
+    box-shadow: 0 8px 30px rgba(178, 36, 67, 0.7);
+  }
+
+  button#backspace {
+    background: linear-gradient(135deg, #ba55d3, #7b1fa2);
+    color: white;
+    font-weight: 700;
+  }
+
+  button#backspace:hover {
+    background: linear-gradient(135deg, #7b1fa2, #ba55d3);
+    box-shadow: 0 8px 30px rgba(123, 31, 162, 0.7);
+  }
+
+  /* Spans */
+  button.zero {
+    grid-column: span 2;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 400px) {
+    .calculator {
+      max-width: 100%;
+      padding: 20px;
+    }
+
+    .display {
+      font-size: 1.5rem;
+      min-height: 52px;
+    }
+
+    button {
+      padding: 14px 0;
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <section class="calculator" role="application" aria-label="Compact Calculator">
+    <h1>Calculator</h1>
+    <output class="display" id="display" aria-live="polite" aria-atomic="true" role="textbox" aria-readonly="true">0</output>
+    <div class="buttons" role="group" aria-label="Calculator buttons">
+      <button class="clear" id="clear" aria-label="Clear all">C</button>
+      <button id="backspace" aria-label="Backspace">←</button>
+      <button class="scientific" data-scientific="percent" aria-label="Percentage">%</button>
+      <button class="operator" data-operator="/" aria-label="Divide">÷</button>
+      <button class="operator" data-operator="*" aria-label="Multiply">×</button>
+      <button class="scientific" data-scientific="square" aria-label="Square">x²</button>
+
+      <button data-number="7" aria-label="Number 7">7</button>
+      <button data-number="8" aria-label="Number 8">8</button>
+      <button data-number="9" aria-label="Number 9">9</button>
+      <button class="operator" data-operator="-" aria-label="Subtract">−</button>
+      <button class="operator" data-operator="+" aria-label="Add">+</button>
+      <button class="scientific" data-scientific="sqrt" aria-label="Square Root">√</button>
+
+      <button data-number="4" aria-label="Number 4">4</button>
+      <button data-number="5" aria-label="Number 5">5</button>
+      <button data-number="6" aria-label="Number 6">6</button>
+      <button data-number="1" aria-label="Number 1">1</button>
+      <button data-number="2" aria-label="Number 2">2</button>
+      <button data-number="3" aria-label="Number 3">3</button>
+
+      <button data-number="0" class="zero" aria-label="Number 0">0</button>
+      <button data-decimal="." aria-label="Decimal point">.</button>
+      <button class="equals" id="equals" aria-label="Calculate result">=</button>
+    </div>
+  </section>
+
+<script>
+  (() => {
+    const display = document.getElementById('display');
+    const buttons = document.querySelectorAll('.buttons button');
+    let currentInput = '0';
+    let previousInput = null;
+    let operator = null;
+    let resetNext = false;
+
+    function updateDisplay() {
+      display.textContent = currentInput;
+    }
+
+    function clear() {
+      currentInput = '0';
+      previousInput = null;
+      operator = null;
+      resetNext = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (resetNext) {
+        currentInput = '0';
+        resetNext = false;
+      } else {
+        if (currentInput.length === 1) {
+          currentInput = '0';
+        } else {
+          currentInput = currentInput.slice(0, -1);
+          if (currentInput === '' || currentInput === '-') currentInput = '0';
+        }
+      }
+      updateDisplay();
+    }
+
+    function appendNumber(number) {
+      if (resetNext) {
+        currentInput = number;
+        resetNext = false;
+      } else {
+        if (currentInput === '0') {
+          currentInput = number;
+        } else {
+          currentInput += number;
+        }
+      }
+    }
+
+    function appendDecimal() {
+      if (resetNext) {
+        currentInput = '0.';
+        resetNext = false;
+        return;
+      }
+      if (!currentInput.includes('.')) {
+        currentInput += '.';
+      }
+    }
+
+    function compute() {
+      if (operator === null || previousInput === null) return;
+      const prev = parseFloat(previousInput);
+      const current = parseFloat(currentInput);
+
+      if (isNaN(prev) || isNaN(current)) return;
+
+      let computation;
+      switch (operator) {
+        case '+':
+          computation = prev + current;
+          break;
+        case '-':
+          computation = prev - current;
+          break;
+        case '*':
+          computation = prev * current;
+          break;
+        case '/':
+          if (current === 0) {
+            computation = 'Error: Div by 0';
+            break;
+          }
+          computation = prev / current;
+          break;
+        default:
+          return;
+      }
+
+      if (typeof computation === 'number' && !isFinite(computation)) {
+        computation = 'Error';
+      }
+
+      currentInput = String(computation);
+      operator = null;
+      previousInput = null;
+      resetNext = true;
+    }
+
+    function setOperator(op) {
+      if (operator !== null) {
+        compute();
+      }
+      previousInput = currentInput;
+      operator = op;
+      resetNext = true;
+    }
+
+    function applyScientific(func) {
+      let value = parseFloat(currentInput);
+      if (isNaN(value)) return;
+      let result;
+
+      switch (func) {
+        case 'square':
+          result = value ** 2;
+          break;
+        case 'sqrt':
+          if (value < 0) {
+            result = 'Error: NaN';
+          } else {
+            result = Math.sqrt(value);
+          }
+          break;
+        case 'percent':
+          result = value / 100;
+          break;
+        default:
+          return;
+      }
+
+      if (typeof result === 'number') {
+        result = Math.round(result * 1e8) / 1e8;
+      }
+      currentInput = String(result);
+      resetNext = true;
+      updateDisplay();
+    }
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        if (button.hasAttribute('data-number')) {
+          appendNumber(button.getAttribute('data-number'));
+          updateDisplay();
+        } else if (button.hasAttribute('data-decimal')) {
+          appendDecimal();
+          updateDisplay();
+        } else if (button.classList.contains('operator')) {
+          setOperator(button.getAttribute('data-operator'));
+        } else if (button.id === 'equals') {
+          compute();
+          updateDisplay();
+        } else if (button.id === 'clear') {
+          clear();
+        } else if (button.id === 'backspace') {
+          backspace();
+        } else if (button.classList.contains('scientific')) {
+          const func = button.getAttribute('data-scientific');
+          applyScientific(func);
+        }
+      });
+    });
+
+    window.addEventListener('keydown', e => {
+      const key = e.key;
+      if ((key >= '0' && key <= '9')) {
+        appendNumber(key);
+        updateDisplay();
+      }
+      if (key === '.') {
+        appendDecimal();
+        updateDisplay();
+      }
+      if (['+', '-', '*', '/'].includes(key)) {
+        setOperator(key);
+      }
+      if (key === 'Enter' || key === '=') {
+        compute();
+        updateDisplay();
+      }
+      if (key === 'Escape' || key.toLowerCase() === 'c') {
+        clear();
+      }
+      if (key === 'Backspace') {
+        backspace();
+      }
+    });
+
+    clear();
+  })();
+</script>
+</body>
+</html>
+
